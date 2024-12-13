@@ -1,0 +1,96 @@
+﻿@page "/"
+@using AspireIssueTriageApp.FrontEnd.Models
+@using AspireIssueTriageApp.FrontEnd.Services
+@inject IssueViewModelService IssueViewModelService
+
+<div class="container mt-4">
+    <h3>How-To Questions</h3>
+    <div class="table-responsive mb-3">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Url</th>
+                    <th>Labels</th>
+                    <th>Summary</th>
+                    <th>Upvotes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var issue in HowToQuestionIssues)
+                {
+                    <tr>
+                        <td><a href="@issue.Url" target="_blank">@issue.Url</a></td>
+                        <td>@string.Join(", ", issue.Labels)</td>
+                        <td class="text-wrap text-break">@issue.Summary</td>
+                        <td>@issue.Upvotes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Likely Bugs</h3>
+    <div class="table-responsive mb-3">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Url</th>
+                    <th>Labels</th>
+                    <th>Summary</th>
+                    <th>Upvotes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var issue in LikelyBugIssues)
+                {
+                    <tr>
+                        <td><a href="@issue.Url" target="_blank">@issue.Url</a></td>
+                        <td>@string.Join(", ", issue.Labels)</td>
+                        <td class="text-wrap text-break">@issue.Summary</td>
+                        <td>@issue.Upvotes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Feature Requests</h3>
+    <div class="table-responsive mb-3">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Url</th>
+                    <th>Labels</th>
+                    <th>Summary</th>
+                    <th>Upvotes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var issue in FeatureRequestIssues)
+                {
+                    <tr>
+                        <td><a href="@issue.Url" target="_blank">@issue.Url</a></td>
+                        <td>@string.Join(", ", issue.Labels)</td>
+                        <td class="text-wrap text-break">@issue.Summary</td>
+                        <td>@issue.Upvotes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<GitHubIssue> HowToQuestionIssues { get; set; } = new();
+    private List<GitHubIssue> LikelyBugIssues { get; set; } = new();
+    private List<GitHubIssue> FeatureRequestIssues { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var issues = await IssueViewModelService.GetAllIssuesAsync();
+
+        HowToQuestionIssues = issues.Where(i => i.IsHowToQuestion).OrderByDescending(i => i.Upvotes).ThenByDescending(i => i.Url).ToList();
+        LikelyBugIssues = issues.Where(i => i.IsLikelyABug).OrderByDescending(i => i.Upvotes).ThenByDescending(i => i.Url).ToList();
+        FeatureRequestIssues = issues.Where(i => i.IsLikelyAFeatureRequest).OrderByDescending(i => i.Upvotes).ThenByDescending(i => i.Url).ToList();
+    }
+}
