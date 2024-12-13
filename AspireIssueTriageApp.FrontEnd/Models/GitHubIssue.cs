@@ -12,6 +12,8 @@ namespace AspireIssueTriageApp.FrontEnd.Models
         /// </summary>
         public int Id { get; set; }
 
+        public string Title { get; set; }
+
         /// <summary>
         /// Gets or sets the URL of the issue.
         /// </summary>

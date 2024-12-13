@@ -70,7 +70,5 @@ namespace AspireIssueTriageApp.FrontEnd.Services
     /// </summary>
     /// <param name="Title">The title of the issue.</param>
     /// <param name="DBIssue">The issue information from the database.</param>
-    public class IssueDetails(string Title, GitHubIssue DBIssue)
-    {
-    }
+    public record IssueDetails(string Title, GitHubIssue DBIssue) { }
 }
