@@ -1,4 +1,6 @@
-using Octokit;
+﻿using Octokit;
+
+namespace AspireIssueTriageApp.Services;
 
 /// <summary>
 /// Service for interacting with the GitHub API to manage issues in the dotnet/aspire repository.

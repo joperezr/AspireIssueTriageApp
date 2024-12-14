@@ -1,4 +1,4 @@
-using AspireIssueTriageApp.FrontEnd.Models;
+﻿using AspireIssueTriageApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
@@ -20,4 +20,3 @@ public class ApplicationDbContext : DbContext
     /// </summary>
     public DbSet<GitHubIssue> GitHubIssues { get; set; }
 }
-   

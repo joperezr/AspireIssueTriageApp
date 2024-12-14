@@ -1,32 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+namespace AspireIssueTriageApp.Services;
 
-/// <summary>
-/// Background service that processes GitHub issues at regular intervals.
-/// </summary>
-public partial class IssueProcessingService : BackgroundService
+public partial class IssueProcessingService(ILogger<IssueProcessingService> logger, ChatService chatService, GitHubService gitHubService, IssuesAPIClient issuesAPIClient) : BackgroundService
 {
-    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
-    private readonly ILogger<IssueProcessingService> _logger;
-    private readonly ChatService _chatService;
-    private readonly GitHubService _gitHubService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IssueProcessingService"/> class.
-    /// </summary>
-    /// <param name="dbContextFactory">The factory to create instances of <see cref="ApplicationDbContext"/>.</param>
-    /// <param name="logger">The logger to log information.</param>
-    /// <param name="chatService">The chat service to process issues.</param>
-    /// <param name="gitHubService">The GitHub service to interact with GitHub issues.</param>
-    public IssueProcessingService(IDbContextFactory<ApplicationDbContext> dbContextFactory, ILogger<IssueProcessingService> logger, ChatService chatService, GitHubService gitHubService)
-    {
-        _dbContextFactory = dbContextFactory;
-        _logger = logger;
-        _chatService = chatService;
-        _gitHubService = gitHubService;
-    }
-
     /// <summary>
     /// This method is called when the <see cref="IHostedService"/> starts. It creates the database if it doesn't exist and starts processing issues.
     /// </summary>
@@ -34,24 +9,10 @@ public partial class IssueProcessingService : BackgroundService
     /// <returns>A <see cref="Task"/> that represents the background operation.</returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await EnsureDatabaseCreatedAsync();
-
         while (!stoppingToken.IsCancellationRequested)
         {
             await ProcessIssuesAsync();
             await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the database is created.
-    /// </summary>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-    private async Task EnsureDatabaseCreatedAsync()
-    {
-        using (var dbContext = _dbContextFactory.CreateDbContext())
-        {
-            await dbContext.Database.EnsureCreatedAsync();
         }
     }
 
@@ -61,41 +22,33 @@ public partial class IssueProcessingService : BackgroundService
     /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
     private async Task ProcessIssuesAsync()
     {
-        Log.ProcessingIssues(_logger);
-        var issues = await _gitHubService.GetUntriagedIssuesAsync();
+        Log.ProcessingIssues(logger);
+        var issues = await gitHubService.GetUntriagedIssuesAsync();
         int totalCount = issues.Count;
         int i = 0;
 
-        HashSet<string> existingIssueUrls = await GetExistingIssueUrlsAsync();
+        HashSet<string> existingIssueUrls = (await issuesAPIClient.GetIssuesAsync()).Select(i => i.Url).ToHashSet();
 
         foreach (var issue in issues)
         {
-            Log.ProcessingIssue(_logger, i++, totalCount);
+            Log.ProcessingIssue(logger, i++, totalCount);
             if (!existingIssueUrls.Contains(issue.HtmlUrl))
             {
                 try
                 {
-                    _ = await _chatService.TriageIssueAsync(issue);
+                    _ = await chatService.TriageIssueAsync(issue);
                 }
                 catch (Exception ex)
                 {
-                    Log.TriageIssueFailed(_logger, issue.Number, ex);
+                    Log.TriageIssueFailed(logger, issue.Number, ex);
                 }
             }
             else
             {
-                Log.IssueAlreadyProcessed(_logger, issue.Number);
+                Log.IssueAlreadyProcessed(logger, issue.Number);
             }
         }
-        Log.FinishProcessingIssues(_logger);
-    }
-
-    private async Task<HashSet<string>> GetExistingIssueUrlsAsync()
-    {
-        using (var dbContext = _dbContextFactory.CreateDbContext())
-        {
-            return new HashSet<string>(await dbContext.GitHubIssues.Select(issue => issue.Url).ToListAsync());
-        }
+        Log.FinishProcessingIssues(logger);
     }
 
     /// <summary>
@@ -114,7 +67,7 @@ public partial class IssueProcessingService : BackgroundService
         /// Logs an information message indicating that issues are being processed.
         /// </summary>
         /// <param name="logger">The logger to log the message.</param>
-        [LoggerMessage(0, LogLevel.Information, "Finished processing issues...")]
+        [LoggerMessage(4, LogLevel.Information, "Finished processing issues...")]
         public static partial void FinishProcessingIssues(ILogger logger);
 
         /// <summary>

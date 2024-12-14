@@ -1,8 +1,6 @@
 using AspireIssueTriageApp.FrontEnd.Components;
 using AspireIssueTriageApp.FrontEnd.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.AI;
-using OpenAI;
+using AspireIssueTriageApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,21 +12,10 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Add DbContext with SQLite
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseSqlite($"Data Source={Path.Combine(Path.GetTempPath(), "aspire-issue-triage.db")}"));
-
-builder.Services.AddSingleton(new OpenAIClient(builder.Configuration.GetValue<string>("OPENAI_API_KEY")));
-
-builder.Services.AddChatClient(services => services.GetRequiredService<OpenAIClient>().AsChatClient("gpt-4o"));
-
-// Register the background service
-builder.Services.AddHostedService<IssueProcessingService>();
-
-// Register the GitHub service as Transient
-builder.Services.AddTransient<GitHubService>();
-
-builder.Services.AddTransient<ChatService>();
+builder.Services.AddHttpClient<IssuesAPIClient>(client =>
+{
+    client.BaseAddress = new Uri("https+http://issue-api");
+});
 
 builder.Services.AddTransient<IssueViewModelService>();
 

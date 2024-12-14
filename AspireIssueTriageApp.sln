@@ -9,6 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireIssueTriageApp.Servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireIssueTriageApp.FrontEnd", "AspireIssueTriageApp.FrontEnd\AspireIssueTriageApp.FrontEnd.csproj", "{EDE02937-E99F-4CAA-9FF3-1ABC8C8095B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireIssueTriageApp.IssueProcessor", "AspireIssueTriageApp.IssueProcessor\AspireIssueTriageApp.IssueProcessor.csproj", "{01EAD7F9-1CF7-4282-832E-6A55A0A9BBB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireIssueTriageApp.IssueService", "AspireIssueTriageApp.IssueService\AspireIssueTriageApp.IssueService.csproj", "{FDCAB722-C487-4D03-97A2-D0EDB616EFF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireIssueTriageApp.Shared", "AspireIssueTriageApp.Shared\AspireIssueTriageApp.Shared.csproj", "{1EB4FB3A-7D4C-457A-8DD2-0B08B51BAC59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireIssueTriageApp.IssueUpdater", "AspireIssueTriageApp.IssueUpdater\AspireIssueTriageApp.IssueUpdater.csproj", "{10DAF9A7-5D40-48BB-B5C7-F27CCAA0D7BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +35,22 @@ Global
 		{EDE02937-E99F-4CAA-9FF3-1ABC8C8095B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDE02937-E99F-4CAA-9FF3-1ABC8C8095B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDE02937-E99F-4CAA-9FF3-1ABC8C8095B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01EAD7F9-1CF7-4282-832E-6A55A0A9BBB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01EAD7F9-1CF7-4282-832E-6A55A0A9BBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01EAD7F9-1CF7-4282-832E-6A55A0A9BBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01EAD7F9-1CF7-4282-832E-6A55A0A9BBB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCAB722-C487-4D03-97A2-D0EDB616EFF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCAB722-C487-4D03-97A2-D0EDB616EFF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCAB722-C487-4D03-97A2-D0EDB616EFF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCAB722-C487-4D03-97A2-D0EDB616EFF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EB4FB3A-7D4C-457A-8DD2-0B08B51BAC59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EB4FB3A-7D4C-457A-8DD2-0B08B51BAC59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EB4FB3A-7D4C-457A-8DD2-0B08B51BAC59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EB4FB3A-7D4C-457A-8DD2-0B08B51BAC59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10DAF9A7-5D40-48BB-B5C7-F27CCAA0D7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DAF9A7-5D40-48BB-B5C7-F27CCAA0D7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DAF9A7-5D40-48BB-B5C7-F27CCAA0D7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DAF9A7-5D40-48BB-B5C7-F27CCAA0D7BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

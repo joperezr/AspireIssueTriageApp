@@ -1,0 +1,6 @@
+@AspireIssueTriageApp.IssueService_HostAddress = http://localhost:5172
+
+GET {{AspireIssueTriageApp.IssueService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

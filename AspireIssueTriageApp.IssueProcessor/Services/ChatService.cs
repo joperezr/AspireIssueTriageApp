@@ -1,30 +1,14 @@
-using AspireIssueTriageApp.FrontEnd.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using AspireIssueTriageApp.Models;
 using Microsoft.Extensions.AI;
 using Octokit;
+
+namespace AspireIssueTriageApp.Services;
 
 /// <summary>
 /// Provides services for interacting with chat clients and triaging GitHub issues.
 /// </summary>
-public partial class ChatService
+public partial class ChatService(IChatClient chatClient, ILogger<ChatService> logger, IssuesAPIClient issuesAPIClient)
 {
-    private readonly IChatClient _chatClient;
-    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
-    private readonly ILogger<ChatService> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChatService"/> class.
-    /// </summary>
-    /// <param name="chatClient">The chat client to be used for AI interactions.</param>
-    /// <param name="dbContextFactory">The factory to create database contexts.</param>
-    /// <param name="logger">The logger to log information.</param>
-    public ChatService(IChatClient chatClient, IDbContextFactory<ApplicationDbContext> dbContextFactory, ILogger<ChatService> logger)
-    {
-        _chatClient = chatClient;
-        _dbContextFactory = dbContextFactory;
-        _logger = logger;
-    }
-
     /// <summary>
     /// Triages a GitHub issue using AI and saves the result to the database.
     /// </summary>
@@ -32,7 +16,7 @@ public partial class ChatService
     /// <returns>A task that represents the asynchronous operation. The task result contains the triaged <see cref="GitHubIssue"/>.</returns>
     public async Task<GitHubIssue> TriageIssueAsync(Issue issue)
     {
-        Log.TriagingIssue(_logger, issue.Number);
+        Log.TriagingIssue(logger, issue.Number);
 
         var prompt = $"You are an AI assistant helping to triage GitHub issues for the dotnet/aspire repository. Given the following issue, return a GitHubIssue model with the fields filled out based on your interpretation.\n\n" +
                      $"Issue Title: {issue.Title}\n" +
@@ -44,16 +28,12 @@ public partial class ChatService
                      "In the Summary field, make sure you call out not just the summary of the issue body, but also a quick summary of the conversation in the issue if any." +
                      "Also always leave the 'IsTriaged' field as false, as you will only help provide info for me to triage the issue, but I still have to do it myself.";
 
-        var gitHubIssue = await _chatClient.CompleteAsync<GitHubIssue>(prompt);
+        var gitHubIssue = await chatClient.CompleteAsync<GitHubIssue>(prompt);
         var gitHubIssueResult = gitHubIssue.Result;
         gitHubIssueResult.Id = 0;
         gitHubIssueResult.IsTriaged = false;
 
-        using (var dbContext = _dbContextFactory.CreateDbContext())
-        {
-            dbContext.GitHubIssues.Add(gitHubIssueResult);
-            await dbContext.SaveChangesAsync();
-        }
+        await issuesAPIClient.CreateIssueAsync(gitHubIssueResult);
 
         return gitHubIssueResult;
     }

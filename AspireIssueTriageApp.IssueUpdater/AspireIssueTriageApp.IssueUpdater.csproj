@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>37fa54a9-0f5e-4338-bcae-6e9dc4fb296e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Octokit" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspireIssueTriageApp.IssueService\AspireIssueTriageApp.IssueService.csproj" />
+    <ProjectReference Include="..\AspireIssueTriageApp.ServiceDefaults\AspireIssueTriageApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\AspireIssueTriageApp.Shared\AspireIssueTriageApp.Shared.csproj" />
+  </ItemGroup>
+</Project>

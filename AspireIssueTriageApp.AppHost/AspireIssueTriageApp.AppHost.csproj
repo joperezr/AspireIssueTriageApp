@@ -17,6 +17,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspireIssueTriageApp.FrontEnd\AspireIssueTriageApp.FrontEnd.csproj" />
+    <ProjectReference Include="..\AspireIssueTriageApp.IssueService\AspireIssueTriageApp.IssueService.csproj" />
+    <ProjectReference Include="..\AspireIssueTriageApp.IssueProcessor\AspireIssueTriageApp.IssueProcessor.csproj" />
+    <ProjectReference Include="..\AspireIssueTriageApp.IssueUpdater\AspireIssueTriageApp.IssueUpdater.csproj" />
   </ItemGroup>
 
 </Project>
