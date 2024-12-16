@@ -1,19 +1,20 @@
 ﻿@page "/"
 @using AspireIssueTriageApp.FrontEnd.Services
 @inject IssueViewModelService IssueViewModelService
+@rendermode InteractiveServer
 
 <div class="container mt-4">
     <h3>Filter Issues</h3>
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="howToQuestions" @bind="showHowToQuestions" @onclick="OnFilterChanged">
+        <input class="form-check-input" type="checkbox" id="howToQuestions" @bind="showHowToQuestions" @bind:after="OnFilterChanged">
         <label class="form-check-label" for="howToQuestions">How-To Questions</label>
     </div>
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="likelyBugs" @bind="showLikelyBugs" @onclick="OnFilterChanged">
+        <input class="form-check-input" type="checkbox" id="likelyBugs" @bind="showLikelyBugs" @bind:after="OnFilterChanged">
         <label class="form-check-label" for="likelyBugs">Likely Bugs</label>
     </div>
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="featureRequests" @bind="showFeatureRequests" @onclick="OnFilterChanged">
+        <input class="form-check-input" type="checkbox" id="featureRequests" @bind="showFeatureRequests" @bind:after="OnFilterChanged">
         <label class="form-check-label" for="featureRequests">Feature Requests</label>
     </div>
 
