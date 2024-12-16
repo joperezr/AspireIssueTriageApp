@@ -49,7 +49,7 @@ public static class Extensions
     {
         builder.Services.AddOpenIddict()
             // Register the OpenIddict client components.
-            .AddClient(async options =>
+            .AddClient(options =>
             {
                 // Allow grant_type=client_credentials to be negotiated.
                 options.AllowClientCredentialsFlow();
