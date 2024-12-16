@@ -12,10 +12,7 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient<IssuesAPIClient>(client =>
-{
-    client.BaseAddress = new Uri("https+http://issue-api");
-});
+builder.AddIssuesAPIClient();
 
 builder.Services.AddTransient<IssueViewModelService>();
 

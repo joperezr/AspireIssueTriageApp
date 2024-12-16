@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>37fa54a9-0f5e-4338-bcae-6e9dc4fb296e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,10 @@
 		<PrivateAssets>all</PrivateAssets>
 	</PackageReference>
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+	<PackageReference Include="OpenIddict.aspnetcore" Version="5.8.0" />
+	<PackageReference Include="openiddict.entityframeworkcore" Version="5.8.0" />
+	<PackageReference Include="openiddict.quartz" Version="5.8.0" />
+	<PackageReference Include="quartz.extensions.hosting" Version="3.13.1" />
   </ItemGroup>
 
   <ItemGroup>

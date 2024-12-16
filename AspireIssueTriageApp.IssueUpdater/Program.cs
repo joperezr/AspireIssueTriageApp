@@ -4,10 +4,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services.AddHttpClient<IssuesAPIClient>(client =>
-{
-    client.BaseAddress = new Uri("https+http://issue-api");
-});
+builder.AddIssuesAPIClient();
 
 builder.Services.AddHostedService<IssueUpdaterService>();
 

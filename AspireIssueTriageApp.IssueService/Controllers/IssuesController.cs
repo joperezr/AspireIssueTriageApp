@@ -1,4 +1,5 @@
 ﻿using AspireIssueTriageApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace AspireIssueTriageApp.IssueService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class IssuesController(IDbContextFactory<ApplicationDbContext> contextFactory) : ControllerBase
     {
         // GET: api/Issues

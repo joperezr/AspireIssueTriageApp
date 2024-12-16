@@ -1,9 +1,13 @@
+using System.Reflection;
+using AspireIssueTriageApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using OpenIddict.Client;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -37,6 +41,45 @@ public static class Extensions
         // {
         //     options.AllowedSchemes = ["https"];
         // });
+
+        return builder;
+    }
+
+    public static TBuilder AddIssuesAPIClient<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddOpenIddict()
+            // Register the OpenIddict client components.
+            .AddClient(async options =>
+            {
+                // Allow grant_type=client_credentials to be negotiated.
+                options.AllowClientCredentialsFlow();
+
+                // Disable token storage, which is not necessary for non-interactive flows like
+                // grant_type=password, grant_type=client_credentials or grant_type=refresh_token.
+                options.DisableTokenStorage();
+
+                // Register the System.Net.Http integration and use the identity of the current
+                // assembly as a more specific user agent, which can be useful when dealing with
+                // providers that use the user agent as a way to throttle requests (e.g Reddit).
+                options.UseSystemNetHttp()
+                    .SetProductInformation(Assembly.GetExecutingAssembly());
+
+                // Add a client registration matching the client application definition in the server project.
+                options.AddRegistration(new OpenIddictClientRegistration
+                {
+                    Issuer = new Uri(Environment.GetEnvironmentVariable("issues-api-endpoint")!, UriKind.Absolute),
+                    ClientId = builder.Configuration.GetValue<string>("OpenIddict:ClientID"),
+                    ClientSecret = builder.Configuration.GetValue<string>("OpenIddict:ClientSecret")
+                });
+            });
+
+        builder.Services.AddTransient<OpenIddictTokenHandler>();
+
+        builder.Services.AddHttpClient<IssuesAPIClient>(client =>
+            {
+                client.BaseAddress = new Uri("https+http://issue-api");
+            })
+            .AddHttpMessageHandler<OpenIddictTokenHandler>();
 
         return builder;
     }

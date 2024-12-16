@@ -12,10 +12,7 @@ builder.Services.AddSingleton(new OpenAIClient(builder.Configuration.GetValue<st
 
 builder.Services.AddChatClient(services => services.GetRequiredService<OpenAIClient>().AsChatClient("gpt-4o"));
 
-builder.Services.AddHttpClient<IssuesAPIClient>(client =>
-{
-    client.BaseAddress = new Uri("https+http://issue-api");
-});
+builder.AddIssuesAPIClient();
 
 builder.Services.AddHostedService<IssueProcessingService>();
 
