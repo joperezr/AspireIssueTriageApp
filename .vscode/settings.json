@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "Iddict"
-    ]
+    ],
+    "github.copilot.advanced": {
+        "debug.overrideEngine": "chat-v3"
+    }
 }

@@ -54,6 +54,7 @@ public partial class IssueUpdaterService(ILogger<IssueUpdaterService> logger, Is
                     issue.Labels = openIssue.Labels.Select(x => x.Name).ToList();
                     issue.Milestone = openIssue.Milestone?.Title;
                     issue.Upvotes = openIssue.Reactions.Plus1;
+                    issue.Number = openIssue.Number;
 
                     LogUpdatingIssue(logger, issue.Url);
                     await issuesAPIClient.UpdateIssueAsync(issue.Id, issue);

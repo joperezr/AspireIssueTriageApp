@@ -26,6 +26,7 @@
         <table class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
+                    <th>Number</th>
                     <th>Issue</th>
                     <th>Labels</th>
                     <th>Summary</th>
@@ -36,10 +37,11 @@
                 @foreach (var issue in FilteredIssues)
                 {
                     <tr>
+                        <td>@issue.DBIssue.Number</td>
                         <td class="text-wrap text-break">
                             @issue.Title
                             <a href="@issue.DBIssue.Url" target="_blank">[Open in GitHub]</a>
-                            <a href="/issue/@issue.DBIssue.Id">[View details]</a>
+                            <a href="/issue/@issue.DBIssue.Number">[View details]</a>
                         </td>
                         <td>@string.Join(", ", issue.DBIssue.Labels)</td>
                         <td class="text-wrap text-break">@issue.DBIssue.Summary</td>

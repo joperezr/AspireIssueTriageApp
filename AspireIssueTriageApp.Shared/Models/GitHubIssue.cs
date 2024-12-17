@@ -23,6 +23,11 @@ public class GitHubIssue : IEquatable<Issue>
     public string Url { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the number of the issue.
+    /// </summary>
+    public int Number { get; set; }
+
+    /// <summary>
     /// Gets or sets the milestone associated with the issue.
     /// </summary>
     public string? Milestone { get; set; }
@@ -74,6 +79,7 @@ public class GitHubIssue : IEquatable<Issue>
         return this.Title == other.Title &&
                this.Milestone == other.Milestone?.Title &&
                HasSameLabels(other) &&
+               Number == other.Number &&
                Upvotes == other.Reactions.Plus1;
     }
 

@@ -25,7 +25,7 @@ namespace AspireIssueTriageApp.IssueService.Controllers
             using var context = contextFactory.CreateDbContext();
             var issue = await context.GitHubIssues.FindAsync(id);
 
-            if (issue == null)
+            if (issue is not {})
             {
                 return NotFound();
             }
@@ -40,7 +40,22 @@ namespace AspireIssueTriageApp.IssueService.Controllers
             using var context = contextFactory.CreateDbContext();
             var issue = await context.GitHubIssues.FirstOrDefaultAsync(i => i.Url == url);
 
-            if (issue == null)
+            if (issue is not {})
+            {
+                return NotFound();
+            }
+
+            return issue;
+        }
+
+        // GET: api/Issues/by-issue-number
+        [HttpGet("by-issue-number")]
+        public async Task<ActionResult<GitHubIssue?>> GetIssueByIssueNumber([FromQuery] int issueNumber)
+        {
+            using var context = contextFactory.CreateDbContext();
+            var issue = await context.GitHubIssues.FirstOrDefaultAsync(i => i.Number == issueNumber);
+
+            if (issue is not {})
             {
                 return NotFound();
             }
@@ -96,7 +111,7 @@ namespace AspireIssueTriageApp.IssueService.Controllers
         {
             using var context = contextFactory.CreateDbContext();
             var issue = await context.GitHubIssues.FindAsync(id);
-            if (issue == null)
+            if (issue is not {})
             {
                 return NotFound();
             }
