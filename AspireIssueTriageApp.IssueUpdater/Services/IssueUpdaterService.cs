@@ -48,10 +48,7 @@ public partial class IssueUpdaterService(ILogger<IssueUpdaterService> logger, Is
             var openIssue = allGitHubIssues.FirstOrDefault(x => x.HtmlUrl == issue.Url);
             if (openIssue != null)
             {
-                if (issue.Title != openIssue.Title || 
-                    issue.Labels != openIssue.Labels.Select(x => x.Name).ToList() ||
-                    issue.Milestone != openIssue.Milestone?.Title ||
-                    issue.Upvotes != openIssue.Reactions.Plus1)
+                if (issue != openIssue)
                 {
                     issue.Title = openIssue.Title;
                     issue.Labels = openIssue.Labels.Select(x => x.Name).ToList();

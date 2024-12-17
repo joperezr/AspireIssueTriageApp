@@ -1,9 +1,11 @@
-﻿namespace AspireIssueTriageApp.Models;
+﻿using Octokit;
+
+namespace AspireIssueTriageApp.Models;
 
 /// <summary>
 /// Represents a GitHub issue with various properties.
 /// </summary>
-public class GitHubIssue
+public class GitHubIssue : IEquatable<Issue>
 {
     /// <summary>
     /// Gets or sets the unique identifier for the issue.
@@ -64,4 +66,57 @@ public class GitHubIssue
     /// Gets or sets the reasoning for the decision on how to mark the issue.
     /// </summary>
     public string? Reasoning { get; set; }
+
+    public bool Equals(Issue? other)
+    {
+        if (other == null) return false;
+
+        return this.Title == other.Title &&
+               this.Milestone == other.Milestone?.Title &&
+               HasSameLabels(other) &&
+               Upvotes == other.Reactions.Plus1;
+    }
+
+    private bool HasSameLabels(Issue other)
+    {
+        if (this.Labels.Count != other.Labels.Count) return false;
+
+        foreach (var label in this.Labels)
+        {
+            if (!other.Labels.Any(l => l.Name == label))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Issue issue)
+        {
+            return Equals(issue);
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Title, Milestone, Labels, Upvotes);
+    }
+
+    public static bool operator ==(GitHubIssue left, Issue right)
+    {
+        if (left is null)
+        {
+            return right is null;
+        }
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(GitHubIssue left, Issue right)
+    {
+        return !(left == right);
+    }
 }
