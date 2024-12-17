@@ -1,0 +1,91 @@
+﻿@page "/issue/{issueNumber:int}"
+@using AspireIssueTriageApp.Models
+@using AspireIssueTriageApp.Services
+@rendermode InteractiveServer
+
+<h3 class="text-center my-4">Issue Details</h3>
+
+@if (isLoading)
+{
+    <div class="d-flex justify-content-center my-4">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (issue is not {})
+{
+    <div class="alert alert-danger text-center" role="alert">
+        Error: Issue not found.
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Field</th>
+                            <th scope="col">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Title</th>
+                            <td>@issue.Title <a href="@issue.Url" target="_blank">[Open in GitHub]</a></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Milestone</th>
+                            <td>@issue.Milestone</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Labels</th>
+                            <td>@string.Join(", ", issue.Labels)</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">UpVotes</th>
+                            <td>@issue.Upvotes</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Summary</th>
+                            <td>@issue.Summary</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Reasoning</th>
+                            <td>@issue.Reasoning</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int issueNumber { get; set; }
+
+    private GitHubIssue? issue;
+    private bool isLoading = true;
+
+    [Inject]
+    private IssuesAPIClient? IssuesApiClient { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            issue = await IssuesApiClient!.GetIssueByNumberAsync(issueNumber);
+        }
+        catch (Exception)
+        {
+            issue = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

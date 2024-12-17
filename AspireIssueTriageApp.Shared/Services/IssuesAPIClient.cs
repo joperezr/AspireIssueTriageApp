@@ -20,6 +20,11 @@ namespace AspireIssueTriageApp.Services
             return await httpClient.GetFromJsonAsync<GitHubIssue>($"/api/Issues/by-url?url={url}");
         }
 
+        public async Task<GitHubIssue?> GetIssueByNumberAsync(int issueNumber)
+        {
+            return await httpClient.GetFromJsonAsync<GitHubIssue>($"/api/Issues/by-issue-number?issueNumber={issueNumber}");
+        }
+
         public async Task<GitHubIssue> CreateIssueAsync(GitHubIssue issue)
         {
             var response = await httpClient.PostAsJsonAsync("/api/Issues", issue);
