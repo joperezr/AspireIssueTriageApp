@@ -1,6 +1,9 @@
 ﻿@page "/issue/{issueNumber:int}"
 @using AspireIssueTriageApp.Models
 @using AspireIssueTriageApp.Services
+@using Markdig
+@using Microsoft.Extensions.AI
+@using Octokit
 @rendermode InteractiveServer
 
 <h3 class="text-center my-4">Issue Details</h3>
@@ -48,6 +51,17 @@ else
                             <th scope="row">UpVotes</th>
                             <td>@issue.Upvotes</td>
                         </tr>
+                        @if (gitHubIssue != null)
+                        {
+                            <tr>
+                                <th scope="row">Description</th>
+                                <td>
+                                    <div class="text-wrap" style="word-wrap: break-word;">
+                                        @((MarkupString)Markdown.ToHtml(gitHubIssue.Body, MarkdownPipeline))
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <th scope="row">Summary</th>
                             <td>@issue.Summary</td>
@@ -61,6 +75,47 @@ else
             </div>
         </div>
     </div>
+
+    @if (!issue.HasAreaLabels())
+    {
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <h3>Suggested Area Labels</h3>
+                    <div>
+                        @foreach (var suggestion in areaLabelSuggestions!)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="@suggestion.AreaLabel" value="@suggestion.AreaLabel">
+                                <label class="form-check-label" for="@suggestion.AreaLabel">
+                                    <strong>@suggestion.AreaLabel</strong> - @suggestion.Reasoning (Likelihood: @suggestion.Confidence%)
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <button class="btn btn-primary mt-3" @onclick="ApplyLabels">Apply</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (gitHubIssue is {})
+    {
+        <div class="col-12 col-md-10 col-lg-8 mt-4">
+            <button class="btn btn-secondary" @onclick="ToggleComments">Toggle Comments</button>
+            @if (showComments)
+            {
+                <div class="mt-3">
+                    @foreach (var comment in IssueComments)
+                    {
+                        <div class="comment">
+                            @comment
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
 }
 
 @code {
@@ -68,16 +123,48 @@ else
     public int issueNumber { get; set; }
 
     private GitHubIssue? issue;
+
+    private Issue? gitHubIssue;
+
     private bool isLoading = true;
+
+    private bool showComments = false;
+
+    private MarkdownPipeline MarkdownPipeline;
+
+    private IEnumerable<string> IssueComments = Array.Empty<string>();
+
+    private IEnumerable<AreaLabelSuggestion>? areaLabelSuggestions;
 
     [Inject]
     private IssuesAPIClient? IssuesApiClient { get; set; }
+
+    [Inject]
+    private GitHubService? GitHubService { get; set; }
+
+    [Inject]
+    private AreaLabelSuggestionClient? AreaLabelSuggestionService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             issue = await IssuesApiClient!.GetIssueByNumberAsync(issueNumber);
+            gitHubIssue = await GitHubService!.GetIssueAsync(issueNumber);
+
+            if (gitHubIssue is {} && gitHubIssue.Comments > 0)
+            {
+                // Fetch comments and add them to the issue object
+                IssueComments = await GitHubService!.GetIssueCommentsAsync(issueNumber);
+            }
+
+            if (issue is {} && !issue.HasAreaLabels())
+            {
+                areaLabelSuggestions = await AreaLabelSuggestionService!.GetAreaLabelSuggestionAsync(issue);
+            }
+
+            var pipelineBuilder = new MarkdownPipelineBuilder();
+            MarkdownPipeline = pipelineBuilder.Build();
         }
         catch (Exception)
         {
@@ -87,5 +174,23 @@ else
         {
             isLoading = false;
         }
+    }
+
+    private async Task ApplyLabels()
+    {
+        var selectedLabels = new List<string>();
+
+        foreach (var label in selectedLabels)
+        {
+            await GitHubService!.AddLabelToIssueAsync(issueNumber, label);
+        }
+
+        // Refresh the issue details
+        issue = await IssuesApiClient!.GetIssueByNumberAsync(issueNumber);
+    }
+
+    private void ToggleComments()
+    {
+        showComments = !showComments;
     }
 }

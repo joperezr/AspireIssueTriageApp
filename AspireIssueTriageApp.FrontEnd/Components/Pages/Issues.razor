@@ -80,13 +80,8 @@
         
         if (showMissingAreaLabels)
         {
-            FilteredIssues = FilteredIssues.Where(i => !HasAreaLabels(i)).ToList();
+            FilteredIssues = FilteredIssues.Where(i => !i.DBIssue.HasAreaLabels()).ToList();
         }
-    }
-
-    private static bool HasAreaLabels(IssueDetails issue)
-    {
-        return issue.DBIssue.Labels.Any(l => l.StartsWith("area-"));
     }
 
     private void OnFilterChanged()

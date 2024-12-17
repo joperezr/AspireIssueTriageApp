@@ -1,4 +1,5 @@
-﻿using Octokit;
+﻿using System.Runtime.CompilerServices;
+using Octokit;
 
 namespace AspireIssueTriageApp.Models;
 
@@ -81,6 +82,11 @@ public class GitHubIssue : IEquatable<Issue>
                HasSameLabels(other) &&
                Number == other.Number &&
                Upvotes == other.Reactions.Plus1;
+    }
+
+    public bool HasAreaLabels()
+    {
+        return Labels.Any(l => l.StartsWith("area-"));
     }
 
     private bool HasSameLabels(Issue other)

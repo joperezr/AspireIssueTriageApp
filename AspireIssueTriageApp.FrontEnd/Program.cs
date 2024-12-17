@@ -1,6 +1,8 @@
 using AspireIssueTriageApp.FrontEnd.Components;
 using AspireIssueTriageApp.FrontEnd.Services;
 using AspireIssueTriageApp.Services;
+using Microsoft.Extensions.AI;
+using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,15 @@ builder.Services.AddRazorComponents()
 
 builder.AddIssuesAPIClient();
 
+builder.Services.AddSingleton(new OpenAIClient(builder.Configuration.GetValue<string>("OPENAI_API_KEY")));
+
+builder.Services.AddChatClient(services => services.GetRequiredService<OpenAIClient>().AsChatClient("gpt-4o"));
+
 builder.Services.AddTransient<IssueViewModelService>();
+
+builder.Services.AddTransient<GitHubService>();
+
+builder.Services.AddSingleton<AreaLabelSuggestionClient>();
 
 var app = builder.Build();
 

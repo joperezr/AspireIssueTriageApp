@@ -1,4 +1,5 @@
-﻿using Octokit;
+using Microsoft.Extensions.Configuration;
+using Octokit;
 
 namespace AspireIssueTriageApp.Services;
 
@@ -34,6 +35,21 @@ public class GitHubService
         };
         request.Labels.Add("untriaged");
         return await _client.Issue.GetAllForRepository("dotnet", "aspire", request);
+    }
+
+    /// <summary>
+    /// Gets all open issues for a specified repository.
+    /// </summary>
+    /// <param name="owner">The owner of the repository.</param>
+    /// <param name="repoName">The name of the repository.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a list of open issues.</returns>
+    public async Task<IReadOnlyList<Issue>> GetAllOpenIssuesForRepository(string owner, string repoName)
+    {
+        var request = new RepositoryIssueRequest
+        {
+            State = ItemStateFilter.Open
+        };
+        return await _client.Issue.GetAllForRepository(owner, repoName, request);
     }
 
     /// <summary>
@@ -89,5 +105,16 @@ public class GitHubService
     public async Task<Issue> GetIssueAsync(int issueNumber)
     {
         return await _client.Issue.Get("dotnet", "aspire", issueNumber);
+    }
+
+    /// <summary>
+    /// Gets all comments for a specified issue.
+    /// </summary>
+    /// <param name="issueNumber">The number of the issue to retrieve.</param>
+    /// <returns>An enumerable of string comments.</returns>
+    public async Task<IEnumerable<string>> GetIssueCommentsAsync(int issueNumber)
+    {
+        var comments = await _client.Issue.Comment.GetAllForIssue("dotnet", "aspire", issueNumber);
+        return comments.Select(c => c.Body);
     }
 }
