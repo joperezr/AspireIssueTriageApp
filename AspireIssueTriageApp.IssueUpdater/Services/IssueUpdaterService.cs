@@ -26,7 +26,7 @@ public partial class IssueUpdaterService(ILogger<IssueUpdaterService> logger, Is
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task UpdateIssuesAsync()
     {
-        var allIssues = await issuesAPIClient.GetIssuesAsync();
+        var allIssues = await issuesAPIClient.GetIssuesAsync(pageSize: 5_000);
         var allGitHubIssues = await gitHubClient.GetAllOpenIssuesForRepository("dotnet", "aspire");
 
         var removeClosedIssuesTask = RemoveClosedAndTriagedIssuesAsync(allIssues, allGitHubIssues);

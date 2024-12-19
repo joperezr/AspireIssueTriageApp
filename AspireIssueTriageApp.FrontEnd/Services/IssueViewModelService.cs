@@ -14,7 +14,7 @@ namespace AspireIssueTriageApp.FrontEnd.Services
         /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="IssueDetails"/>.</returns>
         public async Task<List<IssueDetails>> GetAllIssuesAsync()
         {
-            var issues = await issuesAPIClient.GetIssuesAsync(pageSize: 500);
+            var issues = await issuesAPIClient.GetIssuesAsync(pageSize: 5_000);
             var issueDetailsList = new List<IssueDetails>();
             foreach (var issue in issues)
             {

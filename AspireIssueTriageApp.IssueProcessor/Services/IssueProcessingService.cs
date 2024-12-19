@@ -27,7 +27,7 @@ public partial class IssueProcessingService(ILogger<IssueProcessingService> logg
         int totalCount = issues.Count;
         int i = 0;
 
-        HashSet<string> existingIssueUrls = (await issuesAPIClient.GetIssuesAsync()).Select(i => i.Url).ToHashSet();
+        HashSet<string> existingIssueUrls = (await issuesAPIClient.GetIssuesAsync(pageSize: 5_000)).Select(i => i.Url).ToHashSet();
 
         foreach (var issue in issues)
         {
