@@ -12,10 +12,26 @@ namespace AspireIssueTriageApp.IssueService.Controllers
     {
         // GET: api/Issues
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GitHubIssue>>> GetIssues()
+        public async Task<ActionResult<IEnumerable<GitHubIssue>>> GetIssues([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             using var context = contextFactory.CreateDbContext();
-            return await context.GitHubIssues.ToListAsync();
+            var totalItems = await context.GitHubIssues.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (page < 1 || page > totalPages)
+            {
+                return BadRequest("Invalid page number.");
+            }
+
+            var issues = await context.GitHubIssues
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            Response.Headers.Add("X-Total-Count", totalItems.ToString());
+            Response.Headers.Add("X-Total-Pages", totalPages.ToString());
+
+            return Ok(issues);
         }
 
         // GET: api/Issues/5

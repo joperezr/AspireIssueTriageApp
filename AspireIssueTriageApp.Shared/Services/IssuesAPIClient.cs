@@ -5,9 +5,9 @@ namespace AspireIssueTriageApp.Services
 {
     public class IssuesAPIClient(HttpClient httpClient)
     {
-        public async Task<IEnumerable<GitHubIssue>> GetIssuesAsync()
+        public async Task<IEnumerable<GitHubIssue>> GetIssuesAsync(int page = 1, int pageSize = 10)
         {
-            return await httpClient.GetFromJsonAsync<IEnumerable<GitHubIssue>>("/api/Issues") ?? Enumerable.Empty<GitHubIssue>();
+            return await httpClient.GetFromJsonAsync<IEnumerable<GitHubIssue>>($"/api/Issues?page={page}&pageSize={pageSize}") ?? Enumerable.Empty<GitHubIssue>();
         }
 
         public async Task<GitHubIssue?> GetIssueByIdAsync(int id)
