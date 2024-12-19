@@ -1,26 +1,62 @@
 ﻿@page "/"
 @using AspireIssueTriageApp.FrontEnd.Services
+@using AspireIssueTriageApp.Models
+@using AspireIssueTriageApp.Services
 @inject IssueViewModelService IssueViewModelService
 @rendermode InteractiveServer
 
 <div class="container mt-4">
-    <h3>Filter Issues</h3>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="howToQuestions" @bind="showHowToQuestions" @bind:after="OnFilterChanged">
-        <label class="form-check-label" for="howToQuestions">How-To Questions</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="likelyBugs" @bind="showLikelyBugs" @bind:after="OnFilterChanged">
-        <label class="form-check-label" for="likelyBugs">Likely Bugs</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="featureRequests" @bind="showFeatureRequests" @bind:after="OnFilterChanged">
-        <label class="form-check-label" for="featureRequests">Feature Requests</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="featureRequests" @bind="showMissingAreaLabels" @bind:after="OnFilterChanged">
-        <label class="form-check-label" for="featureRequests">Missing area labels only</label>
-    </div>
+    <button class="btn btn-info" @onclick="ToggleFilterVisibility">
+        @(isFilterVisible ? "Hide Filter" : "Show Filter")
+    </button>
+    @if (isFilterVisible)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5>By Category</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="howToQuestions" @bind="showHowToQuestions" @bind:after="OnFilterChanged">
+                            <label class="form-check-label" for="howToQuestions">How-To Questions</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="likelyBugs" @bind="showLikelyBugs" @bind:after="OnFilterChanged">
+                            <label class="form-check-label" for="likelyBugs">Likely Bugs</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="featureRequests" @bind="showFeatureRequests" @bind:after="OnFilterChanged">
+                            <label class="form-check-label" for="featureRequests">Feature Requests</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        @if (areaLabels is {})
+                        {
+                            <h5>By Area</h5>
+                            <div class="row row-cols-2">
+                                @foreach (var areaLabel in areaLabels)
+                                {
+                                    <div class="col">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="@areaLabel.Name" @bind="selectedAreaLabels[areaLabel.Name]" @bind:after="OnFilterChanged">
+                                            <label class="form-check-label" for="@areaLabel.Name">@areaLabel.Name</label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="col">
+                        <h5>By Missing Area</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="missingAreaLabels" @bind="onlyShowMissingAreaLabels" @bind:after="OnFilterChanged">
+                            <label class="form-check-label" for="missingAreaLabels">Missing area labels only</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 
     <div class="d-flex justify-content-between mb-2">
         <div></div> <!-- Empty div to push the select to the right -->
@@ -38,9 +74,11 @@
             <thead class="thead-dark">
                 <tr>
                     <th>Number</th>
+    using Octokit;
                     <th>Issue</th>
                     <th>Labels</th>
                     <th>Summary</th>
+    using AspireIssueTriageApp.Models;
                     <th>Upvotes</th>
                 </tr>
             </thead>
@@ -87,10 +125,15 @@
     private List<IssueDetails> FilteredIssues { get; set; } = new();
     private List<IssueDetails> PagedIssues { get; set; } = new();
 
+    [Inject]
+    private GitHubService? GitHubService { get; set; }
+
+    private bool isFilterVisible = true;
     private bool showHowToQuestions = true;
     private bool showLikelyBugs = true;
     private bool showFeatureRequests = true;
-    private bool showMissingAreaLabels = false;
+    private bool onlyShowMissingAreaLabels = false;
+    private Dictionary<string, bool> selectedAreaLabels = new Dictionary<string, bool>();
 
     private int currentPage = 1;
     private int pageSize = 10; // Default to 10 items per page
@@ -99,6 +142,11 @@
     protected override async Task OnInitializedAsync()
     {
         AllIssues = await IssueViewModelService.GetAllIssuesAsync();
+        areaLabels = GitHubService!.GetAllAreaLabels();
+        foreach (var areaLabel in areaLabels)
+        {
+            selectedAreaLabels[areaLabel.Name] = true;
+        }
         ApplyFilters();
     }
 
@@ -112,7 +160,7 @@
             .ThenByDescending(i => i.DBIssue.Url)
             .ToList();
 
-        if (showMissingAreaLabels)
+        if (onlyShowMissingAreaLabels)
         {
             FilteredIssues = FilteredIssues.Where(i => !i.DBIssue.HasAreaLabels()).ToList();
         }
@@ -170,4 +218,12 @@
             UpdatePagedIssues();
         }
     }
+
+    private void ToggleFilterVisibility()
+    {
+        isFilterVisible = !isFilterVisible;
+    }
+
+
+    private IReadOnlyList<AreaLabel>? areaLabels;
 }

@@ -1,3 +1,4 @@
+using AspireIssueTriageApp.Models;
 using Microsoft.Extensions.Configuration;
 using Octokit;
 
@@ -127,5 +128,31 @@ public class GitHubService
     {
         var comments = await _client.Issue.Comment.GetAllForIssue("dotnet", "aspire", issueNumber);
         return comments.Select(c => new ValueTuple<string, string>(c.User.Login, c.Body));
+    }
+
+    /// <summary>
+    /// Gets all area labels.
+    /// </summary>
+    /// <returns>A list of area labels.</returns>
+    public IReadOnlyList<AreaLabel> GetAllAreaLabels()
+    {
+        return new List<AreaLabel>
+        {
+            new AreaLabel { Name = "area-docs", Description = "Issues related to missing/wrong documentation or guides." },
+            new AreaLabel { Name = "area-samples", Description = "Issues related to wrong and/or missing sample." },
+            new AreaLabel { Name = "area-dashboard", Description = "Issues related to the Aspire dashboard or something related to the User Interface." },
+            new AreaLabel { Name = "area-acquisition", Description = "Issues related to installing .NET Aspire, or getting its templates." },
+            new AreaLabel { Name = "area-meta", Description = "Issues related to NuGet packages shipped by the repository and their dependencies. Especially issues that are generalized to all the packages that we ship." },
+            new AreaLabel { Name = "area-app-model", Description = "Issues pertaining to the APIs in Aspire.Hosting, e.g. DistributedApplication. These are the extensions that are used to model user's applications which will then be used to orchestrate them. Also issues that are related to the Aspire App Host (also referred to as apphost)" },
+            new AreaLabel { Name = "area-app-testing", Description = "Issues pertaining to the APIs in Aspire.Hosting.Testing. Also issues related to running tests for user's .NET Aspire applications." },
+            new AreaLabel { Name = "area-deployment", Description = "Issues related to deploying .NET Aspire applications to any target environment." },
+            new AreaLabel { Name = "area-engineering-systems", Description = "Issues related to dotnet/aspire repo-specific issues, e.g. CI/CD, AzDO Pipelines, disabled tests, etc." },
+            new AreaLabel { Name = "area-integrations", Description = "Issues related to integrating with other systems, e.g. Azure Service Bus, Azure Storage, etc." },
+            new AreaLabel { Name = "area-orchestrator", Description = "Issues related to DCP (Developer Control Plane), which is .NET Aspire's orchestrator which launches projects and docker containers." },
+            new AreaLabel { Name = "area-service-discovery", Description = "Issues related to our ServiceDiscovery libraries and logic for discovering other services in your application." },
+            new AreaLabel { Name = "area-telemetry", Description = "Issues related to Logging, Telemetry, and traces that are sent to the OTel collector and displayed in the .NET Aspire Dashboard." },
+            new AreaLabel { Name = "area-templates", Description = "Issues related to the .NET Aspire project templates and their documentation." },
+            new AreaLabel { Name = "area-tooling", Description = "Issues related to Visual Studio, Visual Studio Code, or similar tooling that can be used to develop .NET Aspire Applications" }
+        };
     }
 }
