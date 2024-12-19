@@ -28,8 +28,9 @@ namespace AspireIssueTriageApp.IssueService.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            Response.Headers.Add("X-Total-Count", totalItems.ToString());
-            Response.Headers.Add("X-Total-Pages", totalPages.ToString());
+        
+            Response.Headers.Append("X-Total-Count", totalItems.ToString());
+            Response.Headers.Append("X-Total-Pages", totalPages.ToString());
 
             return Ok(issues);
         }

@@ -163,8 +163,11 @@
 
     private void OnPageSizeChanged(ChangeEventArgs e)
     {
-        pageSize = int.Parse(e.Value.ToString());
-        currentPage = 1;
-        UpdatePagedIssues();
+        if (e.Value != null)
+        {
+            pageSize = int.Parse(e.Value.ToString() ?? "10");
+            currentPage = 1;
+            UpdatePagedIssues();
+        }
     }
 }
