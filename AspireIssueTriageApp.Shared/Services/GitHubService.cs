@@ -64,6 +64,17 @@ public class GitHubService
     }
 
     /// <summary>
+    /// Removes a label from a specified issue.
+    /// </summary>
+    /// <param name="issueNumber">The number of the issue to remove the label from.</param>
+    /// <param name="label">The label to remove from the issue.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task RemoveLabelFromIssueAsync(int issueNumber, string label)
+    {
+        await _client.Issue.Labels.RemoveFromIssue("dotnet", "aspire", issueNumber, label);
+    }
+
+    /// <summary>
     /// Adds a comment to a specified issue.
     /// </summary>
     /// <param name="issueNumber">The number of the issue to comment on.</param>

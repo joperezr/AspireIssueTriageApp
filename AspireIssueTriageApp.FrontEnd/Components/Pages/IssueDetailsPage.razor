@@ -45,7 +45,15 @@ else
                         </tr>
                         <tr>
                             <th scope="row">Labels</th>
-                            <td>@string.Join(", ", issue.Labels)</td>
+                            <td>
+                                @foreach (var label in issue.Labels)
+                                {
+                                    <span class="badge rounded-pill text-bg-secondary">
+                                        @label
+                                        <button type="button" class="btn-close" aria-label="Close" @onclick="() => RemoveLabel(label)"></button>
+                                    </span>
+                                }
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">UpVotes</th>
@@ -86,9 +94,22 @@ else
                         @foreach (var suggestion in areaLabelSuggestions!)
                         {
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="@suggestion.AreaLabel" value="@suggestion.AreaLabel">
+                                <input class="form-check-input" type="checkbox" id="@suggestion.AreaLabel" @onchange="@(e =>
+                                {
+                                    if (bool.TryParse(e.Value?.ToString(), out bool isChecked))
+                                    {
+                                    if (isChecked)
+                                        {
+                                            selectedSuggestions.Add(suggestion);
+                                        }
+                                        else
+                                        {
+                                            selectedSuggestions.Remove(suggestion);
+                                        }
+                                    }
+                                })">
                                 <label class="form-check-label" for="@suggestion.AreaLabel">
-                                    <strong>@suggestion.AreaLabel</strong> - @suggestion.Reasoning (Likelihood: @suggestion.Confidence%)
+                                    <strong>@suggestion.AreaLabel</strong> - @suggestion.Reasoning (Likelihood: @suggestion.Confidence)
                                 </label>
                             </div>
                         }
@@ -130,7 +151,9 @@ else
 
     private bool showComments = false;
 
-    private MarkdownPipeline MarkdownPipeline;
+    private List<AreaLabelSuggestion> selectedSuggestions = new List<AreaLabelSuggestion>();
+
+    private MarkdownPipeline? MarkdownPipeline;
 
     private IEnumerable<string> IssueComments = Array.Empty<string>();
 
@@ -178,12 +201,13 @@ else
 
     private async Task ApplyLabels()
     {
-        var selectedLabels = new List<string>();
-
-        foreach (var label in selectedLabels)
+        foreach (var label in selectedSuggestions)
         {
-            await GitHubService!.AddLabelToIssueAsync(issueNumber, label);
+            await GitHubService!.AddLabelToIssueAsync(issueNumber, label.AreaLabel);
+            issue!.Labels.Add(label.AreaLabel);
         }
+
+        await IssuesApiClient!.UpdateIssueAsync(issue!.Id, issue);
 
         // Refresh the issue details
         issue = await IssuesApiClient!.GetIssueByNumberAsync(issueNumber);
@@ -192,5 +216,15 @@ else
     private void ToggleComments()
     {
         showComments = !showComments;
+    }
+
+    private async Task RemoveLabel(string label)
+    {
+        // Update the issue details
+        issue!.Labels.Remove(label);
+
+        await GitHubService!.RemoveLabelFromIssueAsync(issueNumber, label);
+
+        await IssuesApiClient!.UpdateIssueAsync(issue!.Id, issue);
     }
 }

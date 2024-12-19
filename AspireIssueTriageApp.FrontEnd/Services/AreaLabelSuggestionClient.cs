@@ -18,7 +18,7 @@ public partial class AreaLabelSuggestionClient(IChatClient chatClient, GitHubSer
                 Your response should be a JSON array with objects with the following fields:
                 - AreaLabel: The suggested area label for the GitHub issue.
                 - Reasoning: A brief explanation of why you chose this area label.
-                - Confidence: A confidence score (low, medium, high) indicating how certain you are about your suggestion.
+                - Confidence: A confidence score from 0 to 1 indicating how certain you are about your suggestion (0 being not confident at all, and 1 being fully confident).
 
                 Please provide your response in JSON format.
             """;
@@ -39,11 +39,15 @@ public partial class AreaLabelSuggestionClient(IChatClient chatClient, GitHubSer
                 },
                 {
                     "name": "area-acquisition",
-                    "description": "Issues related to installing .NET Aspire, or getting it's templates."
+                    "description": "Issues related to installing .NET Aspire, or getting its templates."
+                },
+                {
+                    "name": "area-meta",
+                    "description": "Issues related to NuGet packages shipped by the repository and their dependencies. Especially issues that are generalized to all the packages that we ship."
                 },
                 {
                     "name": "area-app-model",
-                    "description": "Issues pertaining to the APIs in Aspire.Hosting, e.g. DistributedApplication. These are the extensions that are used to model user's applications which will then be used to orchestrate them."
+                    "description": "Issues pertaining to the APIs in Aspire.Hosting, e.g. DistributedApplication. These are the extensions that are used to model user's applications which will then be used to orchestrate them. Also issues that are related to the Aspire App Host (also referred to as apphost)"
                 },
                 {
                     "name": "area-app-testing",
@@ -127,6 +131,6 @@ public partial class AreaLabelSuggestionClient(IChatClient chatClient, GitHubSer
     partial void LogErrorGettingAreaLabelSuggestion(Exception ex);
 }
 
-public record AreaLabelSuggestion(string AreaLabel, string Reasoning, string Confidence);
+public record AreaLabelSuggestion(string AreaLabel, string Reasoning, double Confidence);
 
 public record GitHubIssueAreaLabelRequest(string Title, string Description, IEnumerable<string> Comments);
