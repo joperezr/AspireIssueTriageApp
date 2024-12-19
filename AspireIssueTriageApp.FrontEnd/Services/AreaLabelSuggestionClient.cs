@@ -92,7 +92,7 @@ public partial class AreaLabelSuggestionClient(IChatClient chatClient, GitHubSer
     {
         var githubIssue = await gitHubService.GetIssueAsync(issue.Number);
 
-        var comments = await gitHubService.GetIssueCommentsAsync(issue.Number);
+        var comments = (await gitHubService.GetIssueCommentsAsync(issue.Number)).Select(c => c.Item2);
 
         var issueRequest = new GitHubIssueAreaLabelRequest(githubIssue.Title, githubIssue.Body, comments);
 

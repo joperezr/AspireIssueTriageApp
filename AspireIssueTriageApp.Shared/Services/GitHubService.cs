@@ -123,9 +123,9 @@ public class GitHubService
     /// </summary>
     /// <param name="issueNumber">The number of the issue to retrieve.</param>
     /// <returns>An enumerable of string comments.</returns>
-    public async Task<IEnumerable<string>> GetIssueCommentsAsync(int issueNumber)
+    public async Task<IEnumerable<(string, string)>> GetIssueCommentsAsync(int issueNumber)
     {
         var comments = await _client.Issue.Comment.GetAllForIssue("dotnet", "aspire", issueNumber);
-        return comments.Select(c => c.Body);
+        return comments.Select(c => new ValueTuple<string, string>(c.User.Login, c.Body));
     }
 }

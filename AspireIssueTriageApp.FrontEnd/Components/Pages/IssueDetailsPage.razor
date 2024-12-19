@@ -26,7 +26,7 @@ else
 {
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8">
+            <div class="col-12">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -35,6 +35,13 @@ else
                         </tr>
                     </thead>
                     <tbody>
+                        @if (gitHubIssue is {})
+                        {
+                            <tr>
+                                <th scope="row">Author</th>
+                                <td>@@@gitHubIssue.User.Login</td>
+                            </tr>
+                        }
                         <tr>
                             <th scope="row">Title</th>
                             <td>@issue.Title <a href="@issue.Url" target="_blank">[Open in GitHub]</a></td>
@@ -88,7 +95,7 @@ else
     {
         <div class="container mt-4">
             <div class="row justify-content-center">
-                <div class="col-12 col-md-10 col-lg-8">
+                <div class="col-12">
                     <h3>Suggested Area Labels</h3>
                     <div>
                         @foreach (var suggestion in areaLabelSuggestions!)
@@ -98,7 +105,7 @@ else
                                 {
                                     if (bool.TryParse(e.Value?.ToString(), out bool isChecked))
                                     {
-                                    if (isChecked)
+                                        if (isChecked)
                                         {
                                             selectedSuggestions.Add(suggestion);
                                         }
@@ -122,19 +129,28 @@ else
 
     @if (gitHubIssue is {})
     {
-        <div class="col-12 col-md-10 col-lg-8 mt-4">
-            <button class="btn btn-secondary" @onclick="ToggleComments">Toggle Comments</button>
-            @if (showComments)
-            {
-                <div class="mt-3">
-                    @foreach (var comment in IssueComments)
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <button class="btn btn-secondary" @onclick="ToggleComments">Toggle Comments</button>
+                    @if (showComments)
                     {
-                        <div class="comment">
-                            @comment
+                        <div class="mt-3">
+                            @foreach (var comment in IssueComments)
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        @@@comment.Item1
+                                    </div>
+                                    <div class="card-body">
+                                        @comment.Item2
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    }
+                    }    
                 </div>
-            }
+            </div>
         </div>
     }
 }
@@ -155,7 +171,7 @@ else
 
     private MarkdownPipeline? MarkdownPipeline;
 
-    private IEnumerable<string> IssueComments = Array.Empty<string>();
+    private IEnumerable<(string, string)> IssueComments = Array.Empty<(string, string)>();
 
     private IEnumerable<AreaLabelSuggestion>? areaLabelSuggestions;
 

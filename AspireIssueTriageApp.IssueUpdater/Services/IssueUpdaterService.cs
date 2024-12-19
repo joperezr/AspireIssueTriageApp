@@ -57,7 +57,14 @@ public partial class IssueUpdaterService(ILogger<IssueUpdaterService> logger, Is
                     issue.Number = openIssue.Number;
 
                     LogUpdatingIssue(logger, issue.Url);
-                    await issuesAPIClient.UpdateIssueAsync(issue.Id, issue);
+                    try
+                    {
+                        await issuesAPIClient.UpdateIssueAsync(issue.Id, issue);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogErrorUpdatingIssue(logger, issue.Url, ex);
+                    }
                 }
                 else
                 {
@@ -109,4 +116,7 @@ public partial class IssueUpdaterService(ILogger<IssueUpdaterService> logger, Is
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Debug, Message = "Issue {IssueUrl} is not closed or triaged.")]
     static partial void LogIssueNotClosedOrTriaged(ILogger logger, string IssueUrl);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Error, Message = "Error updating issue {IssueUrl}")]
+    static partial void LogErrorUpdatingIssue(ILogger logger, string IssueUrl, Exception exception);
 }
